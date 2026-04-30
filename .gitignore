@@ -58,3 +58,4 @@ test_artifacts/
 # Documentation builds
 _build/
 site/
+.env

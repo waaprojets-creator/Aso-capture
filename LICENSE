@@ -1,0 +1,72 @@
+# Licences du projet ASO Capture
+
+Le projet utilise une **double licence** selon la nature du contenu :
+
+---
+
+## Code source (fichiers `.kt`, `.gradle`, `.xml` de configuration)
+
+**Licence : GNU General Public License v3.0 (GPL-3.0)**
+
+ASO Capture is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ASO Capture is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ASO Capture.  If not, see <https://www.gnu.org/licenses/>.
+
+Copyright (C) 2026 Walid (Agence d'architecture)
+
+**Texte intégral GPL-3.0 :** https://www.gnu.org/licenses/gpl-3.0.txt
+
+### Pourquoi GPL-3.0 ?
+- Protection contre l'appropriation propriétaire (cohérent avec la souveraineté visée)
+- Toute modification distribuée doit rester libre et publiée
+- Compatible avec l'écosystème Android Kotlin libre
+
+---
+
+## Documentation, bibliographie, protocoles (fichiers `.md`)
+
+**Licence : Creative Commons Attribution 4.0 International (CC-BY-4.0)**
+
+This work is licensed under the Creative Commons Attribution 4.0
+International License. To view a copy of this license, visit
+http://creativecommons.org/licenses/by/4.0/
+
+Copyright (C) 2026 Walid (Agence d'architecture)
+
+**Texte légal CC-BY-4.0 :** https://creativecommons.org/licenses/by/4.0/legalcode
+
+### Vous êtes libre de :
+- **Partager** — copier, distribuer le matériel sur tout support
+- **Adapter** — remixer, transformer, créer à partir du matériel
+- pour toute utilisation, y compris commerciale
+
+### Selon la condition suivante :
+- **Attribution** — créditer "Walid (Agence d'architecture) — projet ASO Capture", indiquer si des modifications ont été apportées, et fournir un lien vers la licence
+
+### Pourquoi CC-BY-4.0 pour la documentation ?
+- Diffusion la plus large possible des principes méthodologiques
+- Compatible avec les pratiques académiques (citation requise)
+- Permet la traduction et l'adaptation à d'autres contextes
+
+---
+
+## Bibliographie scientifique citée
+
+Les références bibliographiques citées dans `docs/research/` appartiennent à leurs **auteurs et éditeurs respectifs**. Les commentaires et synthèses critiques rédigés par les auteurs du projet ASO sont sous CC-BY-4.0.
+
+Lors de la réutilisation de cette bibliographie, attribuer :
+- La compilation et synthèse à : *Walid, projet ASO Capture, CC-BY-4.0*
+- Chaque référence individuelle à ses auteurs originaux selon les normes académiques
+
+---
+
+*Pour toute question sur les licences, ouvrir une issue GitHub.*

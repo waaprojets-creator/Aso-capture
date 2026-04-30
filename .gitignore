@@ -1,0 +1,60 @@
+# Android Studio / IntelliJ
+.idea/
+.gradle/
+local.properties
+*.iml
+captures/
+
+# Build outputs
+**/build/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Kotlin
+.kotlin/
+
+# Native (NDK)
+.cxx/
+**/*.so
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE
+*.swp
+*.swo
+*~
+.vscode/
+
+# Python (scripts)
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# ASO Capture data — jamais commit
+scans/
+*.mp4
+*.dng
+*.jpg
+!docs/**/*.jpg
+!tools/aruco/*.png
+*.jsonl
+
+# Tests outputs
+test_output/
+test_artifacts/
+
+# Documentation builds
+_build/
+site/

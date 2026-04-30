@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ASO Capture</string>
+
+    <!-- Main activity -->
+    <string name="start_scan">Démarrer un scan</string>
+    <string name="view_scans">Consulter les scans</string>
+    <string name="settings">Paramètres</string>
+
+    <!-- Capture activity -->
+    <string name="calibrate">Calibrer</string>
+    <string name="mark_gcp">GCP</string>
+    <string name="critical_burst">Burst RAW</string>
+    <string name="stop_scan">Arrêter</string>
+
+    <!-- Notification -->
+    <string name="capture_in_progress">Scan en cours</string>
+    <string name="capture_session">Session de capture</string>
+
+    <!-- Errors -->
+    <string name="error_camera_permission">Permission caméra requise</string>
+    <string name="error_location_permission">Permission GPS requise</string>
+    <string name="error_arcore_unavailable">ARCore non disponible sur ce device</string>
+</resources>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ASO Capture</string>
+    <string name="app_brand_a">A</string>
+    <string name="app_brand_so">SO</string>
+    <string name="app_tagline">Architectural · Sovereign · Operator</string>
+
+    <!-- Accueil -->
+    <string name="home_status_system">SYSTÈME</string>
+    <string name="home_status_gnss">GNSS L1+L5</string>
+    <string name="home_status_calib">CALIBRATION</string>
+    <string name="home_status_storage">STOCKAGE</string>
+    <string name="home_status_operational">Opérationnel</string>
+    <string name="home_status_to_check">À vérifier</string>
+
+    <string name="start_scan">Démarrer un scan</string>
+    <string name="start_scan_sub">Niveau 2 · Mètre maçon</string>
+    <string name="calibrate">Calibrer</string>
+    <string name="calibrate_sub">SCALE-LOCK</string>
+    <string name="my_scans">Mes scans</string>
+    <string name="my_scans_sub">%1$d ARCHIVÉS</string>
+
+    <!-- Capture -->
+    <string name="capture_rec">REC · 4K30 · H265</string>
+    <string name="ind_imu">IMU</string>
+    <string name="ind_gnss">GNSS</string>
+    <string name="ind_baro">BARO</string>
+    <string name="ind_feat">FEAT</string>
+    <string name="hud_coverage">COUVERTURE DU SCAN</string>
+    <string name="hud_btn_gcp">GCP</string>
+    <string name="hud_btn_burst">BURST</string>
+    <string name="hud_btn_scale">SCALE</string>
+    <string name="hud_btn_note">NOTE</string>
+
+    <!-- Alerte -->
+    <string name="alert_interrupted">SCAN INTERROMPU · DÉRIVE DÉTECTÉE</string>
+    <string name="alert_recalibrate">Recalibrer maintenant</string>
+    <string name="alert_continue">Continuer (qualité dégradée)</string>
+
+    <!-- Revue -->
+    <string name="review_mesh_draft">MESH DRAFT</string>
+    <string name="review_quality">Qualité du scan</string>
+    <string name="review_transfer_nas">Transférer vers le NAS</string>
+    <string name="review_export">Exporter</string>
+    <string name="review_delete">Supprimer</string>
+
+    <!-- Notification -->
+    <string name="capture_in_progress">Scan en cours</string>
+    <string name="capture_session">Session de capture</string>
+
+    <!-- Erreurs -->
+    <string name="error_camera_permission">Permission caméra requise</string>
+    <string name="error_location_permission">Permission GPS requise</string>
+    <string name="error_arcore_unavailable">ARCore non disponible sur ce device</string>
+</resources>

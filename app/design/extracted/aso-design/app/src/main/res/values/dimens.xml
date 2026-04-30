@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Système d'espacement (grille 4dp) -->
+    <dimen name="aso_space_1">4dp</dimen>
+    <dimen name="aso_space_2">8dp</dimen>
+    <dimen name="aso_space_3">12dp</dimen>
+    <dimen name="aso_space_4">16dp</dimen>
+    <dimen name="aso_space_5">20dp</dimen>
+    <dimen name="aso_space_6">24dp</dimen>
+    <dimen name="aso_space_8">32dp</dimen>
+    <dimen name="aso_space_10">40dp</dimen>
+    <dimen name="aso_space_12">48dp</dimen>
+    <dimen name="aso_space_16">64dp</dimen>
+
+    <!-- Rayons -->
+    <dimen name="aso_radius_sm">4dp</dimen>
+    <dimen name="aso_radius_md">8dp</dimen>
+    <dimen name="aso_radius_lg">12dp</dimen>
+    <dimen name="aso_radius_xl">20dp</dimen>
+    <dimen name="aso_radius_round">9999dp</dimen>
+
+    <!-- Typographie - tailles -->
+    <dimen name="aso_text_xs">10sp</dimen>
+    <dimen name="aso_text_sm">12sp</dimen>
+    <dimen name="aso_text_base">14sp</dimen>
+    <dimen name="aso_text_md">16sp</dimen>
+    <dimen name="aso_text_lg">20sp</dimen>
+    <dimen name="aso_text_xl">28sp</dimen>
+    <dimen name="aso_text_2xl">36sp</dimen>
+    <dimen name="aso_text_display">56sp</dimen>
+
+    <!-- Bordures -->
+    <dimen name="aso_border_width_thin">1dp</dimen>
+    <dimen name="aso_border_width_default">1.5dp</dimen>
+    <dimen name="aso_border_width_strong">2dp</dimen>
+
+    <!-- Touch targets (chantier ganté minimum 48dp) -->
+    <dimen name="aso_touch_min">48dp</dimen>
+    <dimen name="aso_touch_lg">60dp</dimen>
+
+    <!-- Composants spécifiques -->
+    <dimen name="aso_hud_indicator_height">28dp</dimen>
+    <dimen name="aso_hud_button_height">56dp</dimen>
+    <dimen name="aso_hud_stop_size">60dp</dimen>
+    <dimen name="aso_status_led_size">6dp</dimen>
+
+</resources>

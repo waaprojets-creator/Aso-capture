@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASO Capture — Design Viewer v0.1</title>
+  <style>
+    :root {
+      --bg-base:       #0E0F11;
+      --bg-surface:    #16181C;
+      --bg-elevated:   #1E2127;
+      --bg-overlay:    rgba(14,15,17,0.85);
+
+      --border-subtle:  rgba(255,255,255,0.06);
+      --border-default: rgba(255,255,255,0.12);
+      --border-strong:  rgba(255,255,255,0.20);
+
+      --text-primary:   #F2F3F5;
+      --text-secondary: #9DA3AE;
+      --text-tertiary:  #5C6371;
+      --text-disabled:  #3A3F49;
+      --text-on-accent: #0E0F11;
+
+      --accent:         #4ADE80;
+      --accent-dim:     rgba(74,222,128,0.12);
+      --accent-glow:    rgba(74,222,128,0.25);
+
+      --status-ok:   #4ADE80;
+      --status-warn: #F59E0B;
+      --status-crit: #EF4444;
+      --status-info: #60A5FA;
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 20px;
+      --radius-round: 9999px;
+
+      --space-1:  4px;  --space-2:  8px;  --space-3:  12px; --space-4:  16px;
+      --space-5:  20px; --space-6:  24px; --space-8:  32px; --space-10: 40px;
+      --space-12: 48px; --space-16: 64px;
+
+      --text-xs:      10px; --text-sm:   12px; --text-base: 14px;
+      --text-md:      16px; --text-lg:   20px; --text-xl:   28px;
+      --text-2xl:     36px; --text-display: 56px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: var(--text-base);
+      line-height: 1.5;
+    }
+
+    /* ── LAYOUT ─────────────────────────────────────────── */
+    .viewer-shell {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      grid-template-rows: 56px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Top bar */
+    .topbar {
+      grid-column: 1 / -1;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-6);
+      gap: var(--space-4);
+    }
+    .topbar-brand { display: flex; align-items: baseline; gap: 2px; }
+    .brand-a  { font-size: var(--text-xl); font-weight: 300; letter-spacing: -0.03em; color: var(--text-primary); }
+    .brand-so { font-size: var(--text-xl); font-weight: 900; letter-spacing: -0.03em; color: var(--text-primary); }
+    .topbar-sep { width: 1px; height: 20px; background: var(--border-subtle); }
+    .topbar-label { font-family: monospace; font-size: var(--text-xs); letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-tertiary); }
+    .topbar-badge {
+      margin-left: auto;
+      font-family: monospace; font-size: var(--text-xs); letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent);
+      background: var(--accent-dim); border: 1px solid var(--accent-glow);
+      padding: 2px 8px; border-radius: var(--radius-round);
+    }
+
+    /* Sidebar nav */
+    .sidebar {
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      padding: var(--space-5) 0;
+      overflow-y: auto;
+    }
+    .nav-section { padding: var(--space-3) var(--space-4) var(--space-1); }
+    .nav-section-title {
+      font-family: monospace; font-size: var(--text-xs); letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-tertiary);
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      font-size: var(--text-sm); color: var(--text-secondary);
+      cursor: pointer; border-radius: 0;
+      transition: background 0.15s, color 0.15s;
+      text-decoration: none; border: none; background: none;
+      width: 100%; text-align: left;
+    }
+    .nav-item:hover { background: var(--bg-elevated); color: var(--text-primary); }
+    .nav-item.active { background: var(--accent-dim); color: var(--accent); }
+    .nav-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .nav-dot.ok   { background: var(--status-ok); }
+    .nav-dot.warn { background: var(--status-warn); }
+    .nav-dot.crit { background: var(--status-crit); }
+    .nav-dot.info { background: var(--status-info); }
+    .nav-dot.neutral { background: var(--border-default); }
+
+    /* Main content */
+    .main {
+      overflow-y: auto;
+      padding: var(--space-8);
+      display: flex; flex-direction: column; gap: var(--space-8);
+    }
+
+    /* Panels */
+    .panel { display: none; flex-direction: column; gap: var(--space-6); }
+    .panel.active { display: flex; }
+
+    .section-title {
+      font-size: var(--text-sm); font-weight: 600; color: var(--text-secondary);
+      letter-spacing: 0.05em; text-transform: uppercase;
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* ── ANDROID MOCKUP ─────────────────────────────────── */
+    .mockup-wrap {
+      display: flex; gap: var(--space-8); flex-wrap: wrap; align-items: flex-start;
+    }
+    .device {
+      border: 2px solid var(--border-strong);
+      border-radius: 24px;
+      overflow: hidden;
+      background: #000;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 1px var(--border-subtle), 0 24px 64px rgba(0,0,0,0.6);
+    }
+    .device-landscape {
+      width: 720px; height: 320px;
+    }
+    .device-portrait {
+      width: 320px; height: 680px;
+    }
+    .device-screen { width: 100%; height: 100%; position: relative; overflow: hidden; }
+
+    /* ── ACTIVITY MAIN MOCKUP ───────────────────────────── */
+    .screen-main {
+      background: var(--bg-base);
+      padding: var(--space-8);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+    .screen-brand { display: flex; align-items: baseline; gap: 2px; }
+    .screen-brand .a  { font-size: 36px; font-weight: 300; letter-spacing: -0.04em; color: var(--text-primary); }
+    .screen-brand .so { font-size: 36px; font-weight: 900; letter-spacing: -0.04em; color: var(--text-primary); margin-left: 3px; }
+    .screen-tagline { font-family: monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-tertiary); margin-top: -14px; }
+
+    .status-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+    }
+    .status-row {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-1) 0;
+    }
+    .status-label {
+      flex: 1; font-family: monospace; font-size: 9px; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-tertiary);
+    }
+    .led { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .led.ok   { background: var(--status-ok); }
+    .led.warn { background: var(--status-warn); }
+    .led.crit { background: var(--status-crit); }
+    .status-value { font-family: monospace; font-size: 11px; color: var(--text-primary); }
+
+    .btn-primary-mock {
+      background: var(--text-primary);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-6);
+      display: flex; align-items: center; gap: var(--space-3);
+      cursor: default;
+    }
+    .btn-primary-mock .label { flex: 1; }
+    .btn-primary-mock .label .main-text { font-size: 14px; font-weight: 500; color: var(--bg-base); }
+    .btn-primary-mock .label .sub-text  { font-family: monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(14,15,17,0.55); margin-top: 2px; }
+    .btn-primary-mock .arrow { font-size: 16px; color: var(--bg-base); font-weight: 300; }
+
+    .btn-secondary-mock {
+      background: transparent;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-4) var(--space-5);
+      display: flex; align-items: center; gap: var(--space-3);
+    }
+    .btn-secondary-mock .label .main-text { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .btn-secondary-mock .label .sub-text  { font-family: monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-tertiary); margin-top: 2px; }
+
+    /* ── ACTIVITY CAPTURE MOCKUP ────────────────────────── */
+    .screen-capture {
+      width: 100%; height: 100%; position: relative;
+      background: linear-gradient(180deg, #0a0c0f 0%, #16181c 100%);
+      overflow: hidden;
+    }
+    .cam-noise {
+      position: absolute; inset: 0;
+      background-image: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(255,255,255,0.01) 3px, rgba(255,255,255,0.01) 4px
+      );
+      pointer-events: none;
+    }
+    .hud-top {
+      position: absolute; top: 0; left: 0; right: 0;
+      background: rgba(14,15,17,0.90);
+      padding: var(--space-3) var(--space-4);
+      display: flex; align-items: center; gap: var(--space-2);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .hud-rec-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--status-crit); flex-shrink: 0; animation: blink 1.4s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .hud-rec-label { font-family: monospace; font-size: 10px; letter-spacing: 0.08em; color: var(--text-primary); flex: 1; }
+    .hud-duration { font-family: monospace; font-size: 11px; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+    .hud-indicators {
+      position: absolute; top: 40px; right: var(--space-3);
+      display: flex; flex-direction: column; gap: var(--space-1);
+    }
+    .hud-ind-chip {
+      background: rgba(22,24,28,0.92);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 4px 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .hud-ind-chip .lbl { font-family: monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-tertiary); }
+    .hud-ind-chip .val { font-family: monospace; font-size: 10px; color: var(--text-primary); }
+
+    .hud-bottom {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(14,15,17,0.96);
+      padding: var(--space-3) var(--space-4);
+      border-top: 1px solid var(--border-subtle);
+    }
+    .hud-coverage-row {
+      display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);
+    }
+    .hud-coverage-lbl { font-family: monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-tertiary); flex: 1; }
+    .hud-coverage-val { font-family: monospace; font-size: 12px; font-weight: 600; color: var(--accent); }
+    .coverage-bar-wrap { background: var(--border-default); border-radius: var(--radius-round); height: 3px; margin-bottom: var(--space-3); overflow: hidden; }
+    .coverage-bar-fill { height: 100%; background: var(--accent); border-radius: var(--radius-round); width: 67%; }
+    .hud-actions { display: flex; align-items: center; gap: var(--space-2); }
+    .hud-btn {
+      flex: 1; padding: 10px 6px; background: transparent;
+      border: 1px solid var(--border-default); border-radius: var(--radius-md);
+      color: var(--text-primary); font-family: monospace; font-size: 10px;
+      letter-spacing: 0.08em; text-align: center; cursor: default;
+    }
+    .hud-btn-stop {
+      width: 48px; height: 48px; min-width: 48px; border-radius: 50%;
+      background: var(--status-crit); border: none;
+      color: white; font-size: 14px; cursor: default;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── BUG / DIFF CARDS ───────────────────────────────── */
+    .diff-list { display: flex; flex-direction: column; gap: var(--space-4); }
+    .diff-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .diff-header {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .diff-tag {
+      font-family: monospace; font-size: var(--text-xs);
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 2px 8px; border-radius: var(--radius-round);
+    }
+    .diff-tag.bug  { background: rgba(239,68,68,0.15);  color: var(--status-crit); border: 1px solid rgba(239,68,68,0.3); }
+    .diff-tag.warn { background: rgba(245,158,11,0.15); color: var(--status-warn); border: 1px solid rgba(245,158,11,0.3); }
+    .diff-tag.info { background: rgba(96,165,250,0.12); color: var(--status-info); border: 1px solid rgba(96,165,250,0.3); }
+    .diff-tag.ok   { background: var(--accent-dim);     color: var(--accent);       border: 1px solid var(--accent-glow); }
+    .diff-title { font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); }
+    .diff-file  { margin-left: auto; font-family: monospace; font-size: var(--text-xs); color: var(--text-tertiary); }
+    .diff-body { padding: var(--space-4) var(--space-5); }
+    .diff-desc { font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.6; }
+    .diff-code {
+      margin-top: var(--space-3);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      font-family: monospace; font-size: var(--text-xs);
+      color: var(--text-secondary); line-height: 1.7; overflow-x: auto;
+    }
+    .diff-code .del { color: var(--status-crit); }
+    .diff-code .add { color: var(--status-ok); }
+    .diff-code .neutral { color: var(--text-tertiary); }
+
+    /* ── TOKEN TABLE ────────────────────────────────────── */
+    .token-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-3); }
+    .token-chip {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); padding: var(--space-3);
+      display: flex; align-items: center; gap: var(--space-3);
+    }
+    .token-swatch { width: 32px; height: 32px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); flex-shrink: 0; }
+    .token-name { font-family: monospace; font-size: var(--text-xs); color: var(--text-secondary); }
+    .token-val  { font-family: monospace; font-size: var(--text-xs); color: var(--text-tertiary); margin-top: 2px; }
+
+    .dimen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--space-2); }
+    .dimen-chip {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); padding: var(--space-3);
+    }
+    .dimen-name { font-family: monospace; font-size: var(--text-xs); color: var(--text-secondary); }
+    .dimen-val  { font-family: monospace; font-size: var(--text-sm); color: var(--text-primary); margin-top: 2px; }
+    .dimen-bar  { height: 3px; background: var(--accent); border-radius: 2px; margin-top: var(--space-2); }
+
+    /* ── INTEGRATION GUIDE ──────────────────────────────── */
+    .integration-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); }
+    .int-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); padding: var(--space-5);
+    }
+    .int-card h3 { font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-3); }
+    .int-step {
+      display: flex; gap: var(--space-3); margin-bottom: var(--space-3);
+    }
+    .int-step-num {
+      width: 20px; height: 20px; border-radius: 50%; background: var(--accent-dim);
+      border: 1px solid var(--accent-glow); color: var(--accent);
+      font-family: monospace; font-size: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .int-step-text { font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.5; }
+    .int-step-text code {
+      background: var(--bg-base); border: 1px solid var(--border-subtle);
+      border-radius: 3px; padding: 1px 5px;
+      font-family: monospace; font-size: 11px; color: var(--accent);
+    }
+    .missing-list { list-style: none; }
+    .missing-list li {
+      display: flex; gap: var(--space-2); align-items: flex-start;
+      padding: var(--space-2) 0; border-bottom: 1px solid var(--border-subtle);
+      font-size: var(--text-sm); color: var(--text-secondary);
+    }
+    .missing-list li:last-child { border-bottom: none; }
+    .missing-list li::before { content: "—"; color: var(--text-tertiary); flex-shrink: 0; }
+    .missing-tag {
+      font-family: monospace; font-size: 10px; letter-spacing: 0.08em;
+      padding: 1px 6px; border-radius: var(--radius-round); flex-shrink: 0;
+    }
+    .missing-tag.required { background: rgba(239,68,68,0.15); color: var(--status-crit); }
+    .missing-tag.optional { background: var(--accent-dim); color: var(--accent); }
+
+    /* ── FILE TREE ──────────────────────────────────────── */
+    .file-tree {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); padding: var(--space-4);
+      font-family: monospace; font-size: var(--text-xs); line-height: 2;
+    }
+    .tree-dir  { color: var(--text-secondary); }
+    .tree-file { color: var(--text-tertiary); padding-left: 20px; display: block; }
+    .tree-file.exists  { color: var(--status-ok); }
+    .tree-file.missing { color: var(--status-crit); }
+    .tree-file.partial { color: var(--status-warn); }
+    .tree-badge {
+      font-size: 9px; letter-spacing: 0.1em;
+      padding: 1px 5px; border-radius: 3px; margin-left: 8px;
+    }
+    .tree-badge.exists  { background: rgba(74,222,128,0.12); color: var(--status-ok); }
+    .tree-badge.missing { background: rgba(239,68,68,0.12);  color: var(--status-crit); }
+    .tree-badge.partial { background: rgba(245,158,11,0.12); color: var(--status-warn); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<div class="viewer-shell">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="brand-a">A</span>
+      <span class="brand-so">SO</span>
+    </div>
+    <div class="topbar-sep"></div>
+    <span class="topbar-label">Design Viewer</span>
+    <span class="topbar-badge">v0.1 · Analyse</span>
+  </header>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-section"><span class="nav-section-title">Écrans</span></div>
+    <button class="nav-item active" onclick="show('screens')">
+      <span class="nav-dot ok"></span> Mockups Android
+    </button>
+
+    <div class="nav-section"><span class="nav-section-title">Bugs & diffs</span></div>
+    <button class="nav-item" onclick="show('bugs')">
+      <span class="nav-dot crit"></span> Bugs identifiés <span style="margin-left:auto;background:rgba(239,68,68,.15);color:var(--status-crit);font-family:monospace;font-size:10px;padding:1px 7px;border-radius:9999px;">7</span>
+    </button>
+    <button class="nav-item" onclick="show('warnings')">
+      <span class="nav-dot warn"></span> Avertissements <span style="margin-left:auto;background:rgba(245,158,11,.15);color:var(--status-warn);font-family:monospace;font-size:10px;padding:1px 7px;border-radius:9999px;">5</span>
+    </button>
+
+    <div class="nav-section"><span class="nav-section-title">Design system</span></div>
+    <button class="nav-item" onclick="show('colors')">
+      <span class="nav-dot info"></span> Couleurs
+    </button>
+    <button class="nav-item" onclick="show('dimens')">
+      <span class="nav-dot info"></span> Dimensions
+    </button>
+    <button class="nav-item" onclick="show('typography')">
+      <span class="nav-dot info"></span> Typographie
+    </button>
+    <button class="nav-item" onclick="show('components')">
+      <span class="nav-dot info"></span> Composants
+    </button>
+
+    <div class="nav-section"><span class="nav-section-title">Intégration</span></div>
+    <button class="nav-item" onclick="show('integration')">
+      <span class="nav-dot warn"></span> Guide d'intégration
+    </button>
+    <button class="nav-item" onclick="show('filetree')">
+      <span class="nav-dot neutral"></span> Arborescence fichiers
+    </button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- ═══ SCREENS ═══════════════════════════════════════ -->
+    <div class="panel active" id="panel-screens">
+      <h2 class="section-title">Mockups Android — Comparaison design vs code actuel</h2>
+
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+        <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.6;">
+          Les deux écrans ci-dessous reproduisent fidèlement les layouts du ZIP de design (<code style="font-family:monospace;font-size:11px;color:var(--accent)">aso-design-v0.1</code>).
+          Le code actuel dans <code style="font-family:monospace;font-size:11px;color:var(--accent)">app/src/main/res/</code> utilise encore l'ancien thème générique.
+        </p>
+      </div>
+
+      <!-- MainActivity -->
+      <div>
+        <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-3);">activity_main.xml — Portrait 360×780dp</div>
+        <div class="mockup-wrap">
+          <div class="device device-portrait">
+            <div class="device-screen screen-main">
+              <div style="margin-top:var(--space-10)">
+                <div class="screen-brand">
+                  <span class="a">A</span><span class="so">SO</span>
+                </div>
+                <div class="screen-tagline">Architectural · Sovereign · Operator</div>
+              </div>
+
+              <div class="status-card" style="margin-top:var(--space-6)">
+                <div class="status-row">
+                  <span class="status-label">Système</span>
+                  <span class="led ok"></span>
+                  <span class="status-value">Opérationnel</span>
+                </div>
+                <div class="status-row">
+                  <span class="status-label">GNSS L1+L5</span>
+                  <span class="led warn"></span>
+                  <span class="status-value" style="color:var(--status-warn)">À vérifier</span>
+                </div>
+                <div class="status-row">
+                  <span class="status-label">Calibration</span>
+                  <span class="led crit"></span>
+                  <span class="status-value" style="color:var(--status-crit)">Non calibré</span>
+                </div>
+                <div class="status-row">
+                  <span class="status-label">Stockage</span>
+                  <span class="led ok"></span>
+                  <span class="status-value">47.2 Go libres</span>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-top:var(--space-6)">
+                <div class="btn-primary-mock">
+                  <div class="label">
+                    <div class="main-text">Démarrer un scan</div>
+                    <div class="sub-text">Niveau 2 · Mètre maçon</div>
+                  </div>
+                  <div class="arrow">→</div>
+                </div>
+                <div class="btn-secondary-mock">
+                  <div class="label">
+                    <div class="main-text">Calibrer</div>
+                    <div class="sub-text">SCALE-LOCK</div>
+                  </div>
+                  <div class="arrow" style="color:var(--text-secondary)">→</div>
+                </div>
+                <div class="btn-secondary-mock">
+                  <div class="label">
+                    <div class="main-text">Mes scans</div>
+                    <div class="sub-text">0 ARCHIVÉS</div>
+                  </div>
+                  <div class="arrow" style="color:var(--text-secondary)">→</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:1;min-width:240px;display:flex;flex-direction:column;gap:var(--space-4)">
+            <div class="diff-card">
+              <div class="diff-header">
+                <span class="diff-tag crit">BUG</span>
+                <span class="diff-title">Thème et couleurs non appliqués</span>
+              </div>
+              <div class="diff-body">
+                <p class="diff-desc">Le code actuel utilise <code style="font-size:11px;font-family:monospace;color:var(--status-warn)">Theme.AsoCapture</code> mais ce thème pointe vers les <strong>anciennes couleurs</strong> (<code>#1F2937</code>, <code>#3B82F6</code>) et non vers les tokens <code>aso_*</code> du design system.</p>
+              </div>
+            </div>
+            <div class="diff-card">
+              <div class="diff-header">
+                <span class="diff-tag warn">DIFF</span>
+                <span class="diff-title">Layout activity_main.xml à remplacer</span>
+              </div>
+              <div class="diff-body">
+                <p class="diff-desc">Le layout actuel n'a que le bouton "Démarrer", sans brand A·SO, sans status card, sans boutons secondaires Calibrer / Mes scans.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CaptureActivity -->
+      <div style="margin-top:var(--space-4)">
+        <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-3);">activity_capture.xml — Paysage 780×360dp</div>
+        <div class="mockup-wrap">
+          <div class="device device-landscape">
+            <div class="device-screen screen-capture">
+              <div class="cam-noise"></div>
+
+              <!-- Fake camera feed grid -->
+              <div style="position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);pointer-events:none;">
+                <div style="border:0.5px solid rgba(255,255,255,0.04)"></div><div style="border:0.5px solid rgba(255,255,255,0.04)"></div><div style="border:0.5px solid rgba(255,255,255,0.04)"></div>
+                <div style="border:0.5px solid rgba(255,255,255,0.04)"></div><div style="border:0.5px solid rgba(255,255,255,0.04)"></div><div style="border:0.5px solid rgba(255,255,255,0.04)"></div>
+                <div style="border:0.5px solid rgba(255,255,255,0.04)"></div><div style="border:0.5px solid rgba(255,255,255,0.04)"></div><div style="border:0.5px solid rgba(255,255,255,0.04)"></div>
+              </div>
+
+              <!-- HUD top -->
+              <div class="hud-top">
+                <div class="hud-rec-dot"></div>
+                <span class="hud-rec-label">REC · 4K30 · H265</span>
+                <span class="hud-duration">00:02:37</span>
+              </div>
+
+              <!-- HUD indicators right -->
+              <div class="hud-indicators">
+                <div class="hud-ind-chip">
+                  <span class="lbl">IMU</span>
+                  <span class="led ok"></span>
+                  <span class="val">200 Hz</span>
+                </div>
+                <div class="hud-ind-chip">
+                  <span class="lbl">GNSS</span>
+                  <span class="led warn"></span>
+                  <span class="val">14 / 4·L5</span>
+                </div>
+                <div class="hud-ind-chip">
+                  <span class="lbl">BARO</span>
+                  <span class="led ok"></span>
+                  <span class="val">1013.2</span>
+                </div>
+                <div class="hud-ind-chip">
+                  <span class="lbl">FEAT</span>
+                  <span class="led ok"></span>
+                  <span class="val">1 847</span>
+                </div>
+              </div>
+
+              <!-- HUD bottom -->
+              <div class="hud-bottom">
+                <div class="hud-coverage-row">
+                  <span class="hud-coverage-lbl">Couverture du scan</span>
+                  <span class="hud-coverage-val">67 %</span>
+                </div>
+                <div class="coverage-bar-wrap">
+                  <div class="coverage-bar-fill"></div>
+                </div>
+                <div class="hud-actions">
+                  <div class="hud-btn">GCP</div>
+                  <div class="hud-btn">BURST</div>
+                  <div class="hud-btn-stop">■</div>
+                  <div class="hud-btn">SCALE</div>
+                  <div class="hud-btn">NOTE</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:1;min-width:240px;display:flex;flex-direction:column;gap:var(--space-4)">
+            <div class="diff-card">
+              <div class="diff-header">
+                <span class="diff-tag crit">BUG</span>
+                <span class="diff-title">Indicateur FEAT manquant dans le code</span>
+              </div>
+              <div class="diff-body">
+                <p class="diff-desc">Le design prévoit 4 indicateurs HUD (IMU, GNSS, BARO, FEAT). Le layout actuel n'en a que 3 et utilise un ancien système de TextView sans chip card.</p>
+              </div>
+            </div>
+            <div class="diff-card">
+              <div class="diff-header">
+                <span class="diff-tag warn">DIFF</span>
+                <span class="diff-title">5 boutons vs 4 dans le code actuel</span>
+              </div>
+              <div class="diff-body">
+                <p class="diff-desc">Le design ajoute le bouton NOTE absent du code actuel. L'ordre est aussi différent : GCP, BURST, STOP, SCALE, NOTE.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUGS ════════════════════════════════════════ -->
+    <div class="panel" id="panel-bugs">
+      <h2 class="section-title">Bugs identifiés — 7 problèmes bloquants</h2>
+      <div class="diff-list">
+
+        <div class="diff-card">
+          <div class="diff-header">
+            <span class="diff-tag bug">BUG #1</span>
+            <span class="diff-title">Couleurs obsolètes dans themes.xml</span>
+            <span class="diff-file">app/src/main/res/values/themes.xml</span>
+          </div>
+          <div class="diff-body">
+            <p class="diff-desc">Le fichier <code style="font-family:monospace;font-size:11px">themes.xml</code> actuel pointe vers <code style="font-family:monospace;font-size:11px;color:var(--status-crit)">@color/primary</code>, <code style="font-family:monospace;font-size:11px;color:var(--status-crit)">@color/primary_dark</code>, <code style="font-family:monospace;font-size:11px;color:var(--status-crit)">@color/accent</code> définis comme <code>#1F2937</code>, <code>#111827</code>, <code>#3B82F6</code>. Aucun style <code>AsoText.*</code> ni <code>AsoButton.*</code> n'est présent. Toute l'UI sera grise/bleue au lieu du thème noir/vert.</p>
+            <div class="diff-code">
+<span class="del">- &lt;color name="primary"&gt;#FF1F2937&lt;/color&gt;</span>
+<span class="del">- &lt;color name="accent"&gt;#FF3B82F6&lt;/color&gt;</span>
+<span class="add">+ &lt;color name="aso_bg_base"&gt;#0E0F11&lt;/color&gt;</span>
+<span class="add">+ &lt;color name="aso_accent"&gt;#4ADE80&lt;/color&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="diff-card">
+          <div class="diff-header">
+            <span class="diff-tag bug">BUG #2</span>
+            <span class="diff-title">themes.xml sans styles AsoText.* et AsoButton.*</span>
+            <span class="diff-file">app/src/main/res/values/themes.xml</span>
+          </div>
+          <div class="diff-body">
+            <p class="diff-desc">Les layouts du design ZIP référencent <code style="font-family:monospace;font-size:11px;color:var(--status-crit)">style="@style/AsoText.Mono"</code>, <code style="font-family:monospace;font-size:11px;color:var(--status-crit)">style="@style/AsoText.MonoLabel"</code>, <code style="font-family:monospace;font-size:11px;color:var(--status-crit)">style="@style/AsoButton.Secondary"</code>, <code style="font-family:monospace;font-size:11px;color:var(--status-crit)">style="@style/AsoButton.Critical"</code>. Ces styles n'existent pas dans le code actuel → build error ou crash runtime.</p>
+            <div class="diff-code">
+<span class="neutral">// À ajouter dans themes.xml :</span>
+<span class="add">+ &lt;style name="AsoText.Mono" parent=""&gt;</span>
+<span class="add">+   &lt;item name="android:fontFamily"&gt;monospace&lt;/item&gt;</span>
+<span class="add">+   &lt;item name="android:textSize"&gt;@dimen/aso_text_sm&lt;/item&gt;</span>
+<span class="add">+   &lt;item name="android:letterSpacing"&gt;0.05&lt;/item&gt;</span>
+<span class="add">+ &lt;/style&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="diff-card">
+          <div class="diff-header">
+            <span class="diff-tag bug">BUG #3</span>
+            <span class="diff-title">dimens.xml absent — aucun token aso_space_* ni aso_text_*</span>
+            <span class="diff-file">app/src/main/res/values/dimens.xml</span>
+          </div>
+          <div class="diff-body">
+            <p class="diff-desc">Le projet n'a pas de fichier <code style="font-family:monospace;font-size:11px">dimens.xml</code>. Tous les layouts du design ZIP utilisent <code style="font-family:monospace;font-size:11px;color:var(--status-crit)">@dimen/aso_space_4</code>, <code style="font-family:monospace;font-size:11px;color:var(--status-crit)">@dimen/aso_radius_lg</code>, <code style="font-family:monospace;font-size:11px;color:var(--status-crit)">@dimen/aso_text_display</code>, etc. — ce qui provoquerait une erreur de compilation immédiate.</p>
+          </div>
+        </div>
+
+        <div class="diff-card">
+          <div class="diff-header">
+            <span class="diff-tag bug">BUG #4</span>
+            <span class="diff-title">Drawables aso_card_bg, aso_led_*, aso_capture_bg absents</span>
+            <span class="diff-file">app/src/main/res/drawable/</span>
+          </div>
+          <div class="diff-body">
+            <p class="diff-desc">Les 5 drawables du design ZIP sont absents du dossier <code style="font-family:monospace;font-size:11px">drawable/</code> du projet. Les layouts du ZIP y font référence via <code style="font-family:monospace;font-size:11px;color:var(--status-crit)">android:background="@drawable/aso_card_bg"</code> etc. → aapt error à la compilation.</p>
+          </div>
+        </div>
+
+        <div class="diff-card">
+          <div class="diff-header">
+            <span class="diff-tag bug">BUG #5</span>
+            <span class="diff-title">strings.xml incomplet — 15+ clés manquantes</span>
+            <span class="diff-file">app/src/main/res/values/strings.xml</span>
+          </div>
+          <div class="diff-body">
+            <p class="diff-desc">Le strings.xml actuel ne contient pas les nouvelles clés du design :</p>
+            <div class="diff-code">
+<span class="del">manquant : app_brand_a, app_brand_so, app_tagline</span>
+<span class="del">manquant : home_status_gnss, home_status_calib, home_status_storage</span>
+<span class="del">manquant : home_status_to_check, start_scan_sub, calibrate_sub</span>
+<span class="del">manquant : my_scans, my_scans_sub, capture_rec</span>
+<span class="del">manquant : ind_feat, hud_btn_note, alert_*, review_*</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="diff-card">
+          <div class="diff-header">
+            <span class="diff-tag bug">BUG #6</span>
+            <span class="diff-title">activity_capture.xml — ConstraintLayout incomplet pour le HUD indicators</span>
+            <span class="diff-file">app/src/main/res/layout/activity_capture.xml</span>
+          </div>
+          <div class="diff-body">
+            <p class="diff-desc">Le layout du design ZIP pour <code style="font-family:monospace;font-size:11px">hud_indicators</code> utilise des LinearLayout imbriqués avec <code style="font-family:monospace;font-size:11px;color:var(--status-crit)">android:background="@drawable/aso_card_bg"</code> sur chaque chip. Le code actuel utilise une rangée horizontale plate sans card. Résultat visuel complètement différent.</p>
+          </div>
+        </div>
+
+        <div class="diff-card">
+          <div class="diff-header">
+            <span class="diff-tag bug">BUG #7</span>
+            <span class="diff-title">MetadataWriter — import BarometerSample du mauvais package</span>
+            <span class="diff-file">app/src/main/java/ch/aso/capture/storage/MetadataWriter.kt</span>
+          </div>
+          <div class="diff-body">
+            <p class="diff-desc"><code style="font-family:monospace;font-size:11px">MetadataWriter.kt</code> importe <code style="font-family:monospace;font-size:11px;color:var(--status-crit)">ch.aso.capture.logger.BarometerSample</code> mais ce modèle est défini dans <code style="font-family:monospace;font-size:11px;color:var(--status-ok)">ch.aso.capture.logger.SampleModels.kt</code> sous le nom <code>BarometerSample</code>. Le fichier <code>SampleModels.kt</code> ne déclare pas <code>GnssSample</code> au bon package non plus — cross-import incohérent.</p>
+            <div class="diff-code">
+<span class="del">- import ch.aso.capture.logger.BarometerSample  // inexistant</span>
+<span class="del">- import ch.aso.capture.logger.GnssSample       // inexistant</span>
+<span class="add">+ import ch.aso.capture.logger.SensorSample</span>
+<span class="add">+ import ch.aso.capture.logger.GnssSample    // défini dans SampleModels.kt</span>
+<span class="neutral">// vérifier que tous les data class sont dans SampleModels.kt</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══ WARNINGS ════════════════════════════════════ -->
+    <div class="panel" id="panel-warnings">
+      <h2 class="section-title">Avertissements — 5 problèmes non-bloquants</h2>
+      <div class="diff-list">
+
+        <div class="diff-card">
+          <div class="diff-header">
+            <span class="diff-tag warn">WARN #1</span>
+            <span class="diff-title">Police Sora + JetBrains Mono non intégrées (prévues v0.2)</span>
+            <span class="diff-file">app/src/main/res/font/</span>
+          </div>
+          <div class="diff-body">
+            <p class="diff-desc">Le DESIGN_SYSTEM.md indique que l'intégration des fichiers <code style="font-family:monospace;font-size:11px">.ttf</code> Sora et JetBrains Mono est prévue pour v0.2. Actuellement le dossier <code style="font-family:monospace;font-size:11px">res/font/</code> est vide. L'app utilise les polices système (<code>sans-serif-light</code>, <code>monospace</code>). Pas bloquant pour v0.1 mais l'identité visuelle finale sera différente.</p>
+          </div>
+        </div>
+
+        <div class="diff-card">
+          <div class="diff-header">
+            <span class="diff-tag warn">WARN #2</span>
+            <span class="diff-title">aso_status_ok et aso_accent ont la même valeur</span>
+            <span class="diff-file">app/src/main/res/values/colors.xml (design)</span>
+          </div>
+          <div class="diff-body">
+            <p class="diff-desc">Dans le design ZIP, <code style="font-family:monospace;font-size:11px">aso_status_ok</code> et <code style="font-family:monospace;font-size:11px">aso_accent</code> sont tous les deux <code style="font-family:monospace;font-size:11px">#4ADE80</code>. C'est probablement intentionnel (vert = ok = brand) mais cela signifie qu'une barre de progression accent et un LED "ok" sont visuellement identiques, sans distinction possible en état d'alerte partielle.</p>
+          </div>
+        </div>
+
+        <div class="diff-card">
+          <div class="diff-header">
+            <span class="diff-tag warn">WARN #3</span>
+            <span class="diff-title">coverage_bar ProgressBar — progressTint Material3 déprécié</span>
+            <span class="diff-file">app/src/main/res/layout/activity_capture.xml (design)</span>
+          </div>
+          <div class="diff-body">
+            <p class="diff-desc">Le layout design utilise <code style="font-family:monospace;font-size:11px">android:progressTint</code> et <code style="font-family:monospace;font-size:11px">android:progressBackgroundTint</code> sur un <code>ProgressBar</code> standard. Avec Material3, cela est souvent ignoré ou produit un rendu inattendu. À remplacer par un <code>LinearProgressIndicator</code> Material3 pour garantir la cohérence.</p>
+          </div>
+        </div>
+
+        <div class="diff-card">
+          <div class="diff-header">
+            <span class="diff-tag warn">WARN #4</span>
+            <span class="diff-title">action_primary dans activity_main.xml sans ConstraintLayout constraints</span>
+            <span class="diff-file">app/src/main/res/layout/activity_main.xml (design)</span>
+          </div>
+          <div class="diff-body">
+            <p class="diff-desc">Le <code>LinearLayout#action_primary</code> n'a que <code>constraintTop_toBottomOf="@id/status_card"</code> mais pas de <code>constraintStart_toStartOf</code> ni <code>constraintEnd_toEndOf</code>. Dans un ConstraintLayout, sans ces deux contraintes horizontales, la vue ne sera pas positionnée correctement sur tous les appareils.</p>
+            <div class="diff-code">
+<span class="add">+ app:layout_constraintStart_toStartOf="parent"</span>
+<span class="add">+ app:layout_constraintEnd_toEndOf="parent"</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="diff-card">
+          <div class="diff-header">
+            <span class="diff-tag warn">WARN #5</span>
+            <span class="diff-title">aso_border_width_default = 1.5dp non supporté sur tous les écrans</span>
+            <span class="diff-file">app/src/main/res/values/dimens.xml (design)</span>
+          </div>
+          <div class="diff-body">
+            <p class="diff-desc">Une valeur de <code>1.5dp</code> est définie pour <code>aso_border_width_default</code>. Sur les écrans mdpi (1px/dp), cette valeur sera arrondie à 2px. Sur les écrans xxhdpi (3px/dp), elle sera arrondie à 5px — rendu potentiellement épais. À tester sur différentes densités.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══ COLORS ═══════════════════════════════════════ -->
+    <div class="panel" id="panel-colors">
+      <h2 class="section-title">Palette — colors.xml (design ZIP)</h2>
+
+      <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-2)">Surfaces</div>
+      <div class="token-grid">
+        <div class="token-chip"><div class="token-swatch" style="background:#0E0F11"></div><div><div class="token-name">aso_bg_base</div><div class="token-val">#0E0F11</div></div></div>
+        <div class="token-chip"><div class="token-swatch" style="background:#16181C"></div><div><div class="token-name">aso_bg_surface</div><div class="token-val">#16181C</div></div></div>
+        <div class="token-chip"><div class="token-swatch" style="background:#1E2127"></div><div><div class="token-name">aso_bg_elevated</div><div class="token-val">#1E2127</div></div></div>
+      </div>
+
+      <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-2);margin-top:var(--space-5)">Texte</div>
+      <div class="token-grid">
+        <div class="token-chip"><div class="token-swatch" style="background:#F2F3F5"></div><div><div class="token-name">aso_text_primary</div><div class="token-val">#F2F3F5</div></div></div>
+        <div class="token-chip"><div class="token-swatch" style="background:#9DA3AE"></div><div><div class="token-name">aso_text_secondary</div><div class="token-val">#9DA3AE</div></div></div>
+        <div class="token-chip"><div class="token-swatch" style="background:#5C6371"></div><div><div class="token-name">aso_text_tertiary</div><div class="token-val">#5C6371</div></div></div>
+        <div class="token-chip"><div class="token-swatch" style="background:#3A3F49"></div><div><div class="token-name">aso_text_disabled</div><div class="token-val">#3A3F49</div></div></div>
+      </div>
+
+      <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-2);margin-top:var(--space-5)">Accent & statuts</div>
+      <div class="token-grid">
+        <div class="token-chip"><div class="token-swatch" style="background:#4ADE80"></div><div><div class="token-name">aso_accent / aso_status_ok</div><div class="token-val">#4ADE80</div></div></div>
+        <div class="token-chip"><div class="token-swatch" style="background:#F59E0B"></div><div><div class="token-name">aso_status_warn</div><div class="token-val">#F59E0B</div></div></div>
+        <div class="token-chip"><div class="token-swatch" style="background:#EF4444"></div><div><div class="token-name">aso_status_crit</div><div class="token-val">#EF4444</div></div></div>
+        <div class="token-chip"><div class="token-swatch" style="background:#60A5FA"></div><div><div class="token-name">aso_status_info</div><div class="token-val">#60A5FA</div></div></div>
+      </div>
+
+      <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-2);margin-top:var(--space-5)">Bordures (alpha)</div>
+      <div class="token-grid">
+        <div class="token-chip"><div class="token-swatch" style="background:rgba(255,255,255,0.06);border:1px dashed rgba(255,255,255,0.15)"></div><div><div class="token-name">aso_border_subtle</div><div class="token-val">#0FFFFFFF (6%)</div></div></div>
+        <div class="token-chip"><div class="token-swatch" style="background:rgba(255,255,255,0.12);border:1px dashed rgba(255,255,255,0.15)"></div><div><div class="token-name">aso_border_default</div><div class="token-val">#1FFFFFFF (12%)</div></div></div>
+        <div class="token-chip"><div class="token-swatch" style="background:rgba(255,255,255,0.20);border:1px dashed rgba(255,255,255,0.15)"></div><div><div class="token-name">aso_border_strong</div><div class="token-val">#33FFFFFF (20%)</div></div></div>
+      </div>
+    </div>
+
+    <!-- ═══ DIMENS ════════════════════════════════════════ -->
+    <div class="panel" id="panel-dimens">
+      <h2 class="section-title">Dimensions — dimens.xml (design ZIP)</h2>
+
+      <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-2)">Espacement (grille 4dp)</div>
+      <div class="dimen-grid">
+        <div class="dimen-chip"><div class="dimen-name">aso_space_1</div><div class="dimen-val">4dp</div><div class="dimen-bar" style="width:4px"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_space_2</div><div class="dimen-val">8dp</div><div class="dimen-bar" style="width:8px"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_space_3</div><div class="dimen-val">12dp</div><div class="dimen-bar" style="width:12px"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_space_4</div><div class="dimen-val">16dp</div><div class="dimen-bar" style="width:16px"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_space_5</div><div class="dimen-val">20dp</div><div class="dimen-bar" style="width:20px"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_space_6</div><div class="dimen-val">24dp</div><div class="dimen-bar" style="width:24px"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_space_8</div><div class="dimen-val">32dp</div><div class="dimen-bar" style="width:32px"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_space_10</div><div class="dimen-val">40dp</div><div class="dimen-bar" style="width:40px"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_space_12</div><div class="dimen-val">48dp</div><div class="dimen-bar" style="width:48px"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_space_16</div><div class="dimen-val">64dp</div><div class="dimen-bar" style="width:64px"></div></div>
+      </div>
+
+      <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-2);margin-top:var(--space-5)">Typographie</div>
+      <div class="dimen-grid">
+        <div class="dimen-chip"><div class="dimen-name">aso_text_xs</div><div class="dimen-val">10sp</div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_text_sm</div><div class="dimen-val">12sp</div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_text_base</div><div class="dimen-val">14sp</div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_text_md</div><div class="dimen-val">16sp</div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_text_lg</div><div class="dimen-val">20sp</div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_text_xl</div><div class="dimen-val">28sp</div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_text_display</div><div class="dimen-val">56sp</div></div>
+      </div>
+
+      <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-2);margin-top:var(--space-5)">Rayons</div>
+      <div class="dimen-grid">
+        <div class="dimen-chip"><div class="dimen-name">aso_radius_sm</div><div class="dimen-val">4dp</div><div style="width:32px;height:16px;border:1px solid var(--accent);border-radius:4px;margin-top:var(--space-2)"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_radius_md</div><div class="dimen-val">8dp</div><div style="width:32px;height:16px;border:1px solid var(--accent);border-radius:8px;margin-top:var(--space-2)"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_radius_lg</div><div class="dimen-val">12dp</div><div style="width:32px;height:16px;border:1px solid var(--accent);border-radius:12px;margin-top:var(--space-2)"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_radius_xl</div><div class="dimen-val">20dp</div><div style="width:32px;height:16px;border:1px solid var(--accent);border-radius:20px;margin-top:var(--space-2)"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_radius_round</div><div class="dimen-val">9999dp</div><div style="width:32px;height:16px;border:1px solid var(--accent);border-radius:9999px;margin-top:var(--space-2)"></div></div>
+      </div>
+
+      <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-2);margin-top:var(--space-5)">Touch targets (chantier avec gants)</div>
+      <div class="dimen-grid">
+        <div class="dimen-chip"><div class="dimen-name">aso_touch_min</div><div class="dimen-val">48dp</div><div class="dimen-bar" style="width:48px"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_touch_lg</div><div class="dimen-val">60dp</div><div class="dimen-bar" style="width:60px"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_hud_stop_size</div><div class="dimen-val">60dp</div><div class="dimen-bar" style="width:60px"></div></div>
+        <div class="dimen-chip"><div class="dimen-name">aso_status_led_size</div><div class="dimen-val">6dp</div><div style="width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:var(--space-2)"></div></div>
+      </div>
+    </div>
+
+    <!-- ═══ TYPOGRAPHY ════════════════════════════════════ -->
+    <div class="panel" id="panel-typography">
+      <h2 class="section-title">Typographie — styles définis dans themes.xml</h2>
+
+      <div style="display:flex;flex-direction:column;gap:var(--space-5)">
+        <div class="diff-card">
+          <div class="diff-body" style="padding:var(--space-5)">
+            <div style="font-size:56px;font-weight:300;letter-spacing:-0.05em;color:var(--text-primary);line-height:1">A·SO</div>
+            <div style="font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-tertiary);margin-top:var(--space-2)">AsoText.Display — 56sp sans-serif-light · tracking -0.05</div>
+          </div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-body" style="padding:var(--space-5)">
+            <div style="font-size:28px;letter-spacing:-0.02em;color:var(--text-primary)">Scan en cours</div>
+            <div style="font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-tertiary);margin-top:var(--space-2)">AsoText.Title — 28sp sans-serif · tracking -0.02</div>
+          </div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-body" style="padding:var(--space-5)">
+            <div style="font-size:14px;color:var(--text-primary)">Précision relative inférieure à 1 cm sur les cotes locales.</div>
+            <div style="font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-tertiary);margin-top:var(--space-2)">AsoText.Body — 14sp sans-serif</div>
+          </div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-body" style="padding:var(--space-5)">
+            <div style="font-family:monospace;font-size:12px;letter-spacing:0.05em;color:var(--text-secondary)">IMU 200 Hz · GNSS L1+L5 · 14 sats</div>
+            <div style="font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-tertiary);margin-top:var(--space-2)">AsoText.Mono — 12sp monospace · tracking +0.05</div>
+          </div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-body" style="padding:var(--space-5)">
+            <div style="font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-tertiary)">COUVERTURE DU SCAN</div>
+            <div style="font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-tertiary);margin-top:var(--space-2)">AsoText.MonoLabel — 10sp monospace uppercase · tracking +0.15</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ COMPONENTS ════════════════════════════════════ -->
+    <div class="panel" id="panel-components">
+      <h2 class="section-title">Composants — Preview des styles</h2>
+
+      <div style="display:flex;flex-direction:column;gap:var(--space-6)">
+        <div>
+          <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-3)">Boutons</div>
+          <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center">
+            <div style="background:var(--text-primary);color:var(--bg-base);padding:14px 24px;border-radius:12px;font-size:14px;font-weight:500;cursor:default">AsoButton.Primary</div>
+            <div style="background:transparent;border:1.5px solid var(--border-default);color:var(--text-primary);padding:14px 24px;border-radius:8px;font-size:14px;font-weight:500;cursor:default">AsoButton.Secondary</div>
+            <div style="background:var(--status-crit);color:#fff;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:default">■</div>
+          </div>
+          <div style="font-family:monospace;font-size:10px;color:var(--text-tertiary);margin-top:var(--space-2)">Primary · Secondary · Critical (stop)</div>
+        </div>
+
+        <div>
+          <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-3)">LEDs de statut</div>
+          <div style="display:flex;gap:var(--space-4);align-items:center">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:6px;height:6px;border-radius:50%;background:var(--status-ok)"></div>
+              <span style="font-family:monospace;font-size:12px;color:var(--text-secondary)">aso_led_ok</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:6px;height:6px;border-radius:50%;background:var(--status-warn)"></div>
+              <span style="font-family:monospace;font-size:12px;color:var(--text-secondary)">aso_led_warn</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:6px;height:6px;border-radius:50%;background:var(--status-crit)"></div>
+              <span style="font-family:monospace;font-size:12px;color:var(--text-secondary)">aso_led_crit</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-3)">Card surface (aso_card_bg)</div>
+          <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:12px;padding:20px;max-width:320px">
+            <div style="font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px">GNSS L1+L5</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:6px;height:6px;border-radius:50%;background:var(--status-ok)"></div>
+              <span style="font-family:monospace;font-size:12px;color:var(--text-primary)">14 sats · 4 L5 · ±3.2 m</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-3)">Barre de couverture</div>
+          <div style="max-width:320px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+              <span style="font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-tertiary)">Couverture du scan</span>
+              <span style="font-family:monospace;font-size:12px;font-weight:600;color:var(--accent)">67 %</span>
+            </div>
+            <div style="background:var(--border-default);border-radius:9999px;height:3px;overflow:hidden">
+              <div style="height:100%;background:var(--accent);border-radius:9999px;width:67%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ INTEGRATION ═══════════════════════════════════ -->
+    <div class="panel" id="panel-integration">
+      <h2 class="section-title">Guide d'intégration des fichiers thèmes</h2>
+
+      <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.6;max-width:680px">
+        Pour intégrer complètement le design system du ZIP dans le projet Android, il faut effectuer ces opérations dans l'ordre. Chaque étape résout un ou plusieurs bugs identifiés.
+      </p>
+
+      <div class="integration-grid">
+        <div class="int-card">
+          <h3>Etape 1 — Remplacer colors.xml</h3>
+          <div class="int-step">
+            <div class="int-step-num">1</div>
+            <div class="int-step-text">Copier <code>aso-design/app/src/main/res/values/colors.xml</code> vers <code>app/src/main/res/values/colors.xml</code> en écrasant le fichier existant.</div>
+          </div>
+          <div class="int-step">
+            <div class="int-step-num">2</div>
+            <div class="int-step-text">Vérifier que les anciennes clés <code>primary</code>, <code>primary_dark</code>, <code>accent</code>, <code>red_critical</code>, <code>green_ok</code>, <code>orange_warning</code> sont conservées pour la compatibilité Material3 (elles sont présentes dans le ZIP).</div>
+          </div>
+        </div>
+
+        <div class="int-card">
+          <h3>Etape 2 — Créer dimens.xml</h3>
+          <div class="int-step">
+            <div class="int-step-num">1</div>
+            <div class="int-step-text">Copier <code>aso-design/app/src/main/res/values/dimens.xml</code> vers <code>app/src/main/res/values/dimens.xml</code> (fichier absent, à créer).</div>
+          </div>
+          <div class="int-step">
+            <div class="int-step-num">2</div>
+            <div class="int-step-text">Ce fichier est requis par tous les layouts du design. Sans lui → erreur de compilation immédiate.</div>
+          </div>
+        </div>
+
+        <div class="int-card">
+          <h3>Etape 3 — Remplacer themes.xml</h3>
+          <div class="int-step">
+            <div class="int-step-num">1</div>
+            <div class="int-step-text">Copier <code>aso-design/app/src/main/res/values/themes.xml</code> en écrasant l'existant. Ce fichier ajoute les styles <code>AsoText.*</code> et <code>AsoButton.*</code> indispensables.</div>
+          </div>
+          <div class="int-step">
+            <div class="int-step-num">2</div>
+            <div class="int-step-text">Vérifier que <code>Theme.AsoCapture</code> est toujours référencé dans <code>AndroidManifest.xml</code> — c'est le cas, pas de changement nécessaire.</div>
+          </div>
+        </div>
+
+        <div class="int-card">
+          <h3>Etape 4 — Ajouter les drawables</h3>
+          <div class="int-step">
+            <div class="int-step-num">1</div>
+            <div class="int-step-text">Copier les 5 fichiers <code>aso_*.xml</code> depuis <code>aso-design/app/src/main/res/drawable/</code> vers <code>app/src/main/res/drawable/</code>.</div>
+          </div>
+          <div class="int-step">
+            <div class="int-step-num">2</div>
+            <div class="int-step-text">Ces drawables référencent les tokens <code>@color/aso_bg_surface</code> etc. — ils nécessitent que l'étape 1 soit faite avant.</div>
+          </div>
+        </div>
+
+        <div class="int-card">
+          <h3>Etape 5 — Mettre à jour strings.xml</h3>
+          <div class="int-step">
+            <div class="int-step-num">1</div>
+            <div class="int-step-text">Fusionner le <code>strings.xml</code> du ZIP avec l'existant. Ajouter toutes les clés <code>app_brand_a</code>, <code>home_status_*</code>, <code>capture_rec</code>, <code>hud_*</code>, <code>alert_*</code>, <code>review_*</code>.</div>
+          </div>
+          <div class="int-step">
+            <div class="int-step-num">2</div>
+            <div class="int-step-text">Ne pas supprimer les clés existantes pour ne pas casser les layouts actuels pendant la migration.</div>
+          </div>
+        </div>
+
+        <div class="int-card">
+          <h3>Etape 6 — Remplacer les layouts</h3>
+          <div class="int-step">
+            <div class="int-step-num">1</div>
+            <div class="int-step-text">Copier <code>activity_main.xml</code> et <code>activity_capture.xml</code> du ZIP en écrasant les fichiers existants.</div>
+          </div>
+          <div class="int-step">
+            <div class="int-step-num">2</div>
+            <div class="int-step-text">Mettre à jour <code>MainActivity.kt</code> et <code>CaptureActivity.kt</code> pour binder les nouveaux IDs : <code>status_card</code>, <code>action_primary</code>, <code>hud_indicators</code>, <code>btn_gcp</code>, <code>btn_burst</code>, <code>btn_stop</code>, <code>btn_scale</code>, <code>btn_note</code>.</div>
+          </div>
+          <div class="int-step">
+            <div class="int-step-num">3</div>
+            <div class="int-step-text">Corriger le Bug #4 (constraints manquantes) avant de pusher.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:var(--space-6)">
+        <h3 style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);margin-bottom:var(--space-4)">Ce qu'il manque encore pour une intégration complète</h3>
+        <ul class="missing-list">
+          <li><span class="missing-tag required">REQUIS</span> Fichier <code style="font-family:monospace;font-size:11px">dimens.xml</code> — absent du projet, bloquant</li>
+          <li><span class="missing-tag required">REQUIS</span> Polices <code style="font-family:monospace;font-size:11px">Sora-Light.ttf</code>, <code style="font-family:monospace;font-size:11px">Sora-Black.ttf</code> dans <code>res/font/</code> — pour le branding A·SO définitif</li>
+          <li><span class="missing-tag required">REQUIS</span> Police <code style="font-family:monospace;font-size:11px">JetBrainsMono-Regular.ttf</code> — pour tous les styles <code>AsoText.Mono*</code></li>
+          <li><span class="missing-tag required">REQUIS</span> Mise à jour des imports dans <code style="font-family:monospace;font-size:11px">MainActivity.kt</code> et <code style="font-family:monospace;font-size:11px">CaptureActivity.kt</code> pour les nouveaux IDs de vues</li>
+          <li><span class="missing-tag required">REQUIS</span> Correction du package import dans <code style="font-family:monospace;font-size:11px">MetadataWriter.kt</code> (Bug #7)</li>
+          <li><span class="missing-tag optional">OPTIONNEL v0.2</span> Icône lanceur <code style="font-family:monospace;font-size:11px">ic_launcher</code> au format ASO (actuellement icône Android générique)</li>
+          <li><span class="missing-tag optional">OPTIONNEL v0.2</span> <code style="font-family:monospace;font-size:11px">LinearProgressIndicator</code> Material3 au lieu du ProgressBar standard (Warn #3)</li>
+          <li><span class="missing-tag optional">OPTIONNEL v0.2</span> Mode clair adaptatif prévu dans le DESIGN_SYSTEM.md</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ═══ FILE TREE ══════════════════════════════════════ -->
+    <div class="panel" id="panel-filetree">
+      <h2 class="section-title">Arborescence — état actuel vs design ZIP</h2>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5)">
+        <div>
+          <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-3)">Projet actuel</div>
+          <div class="file-tree">
+            <div class="tree-dir">app/src/main/res/</div>
+            <div class="tree-dir" style="padding-left:12px">drawable/</div>
+            <span class="tree-file missing">aso_card_bg.xml <span class="tree-badge missing">MANQUANT</span></span>
+            <span class="tree-file missing">aso_led_ok.xml <span class="tree-badge missing">MANQUANT</span></span>
+            <span class="tree-file missing">aso_led_warn.xml <span class="tree-badge missing">MANQUANT</span></span>
+            <span class="tree-file missing">aso_led_crit.xml <span class="tree-badge missing">MANQUANT</span></span>
+            <span class="tree-file missing">aso_capture_bg.xml <span class="tree-badge missing">MANQUANT</span></span>
+            <div class="tree-dir" style="padding-left:12px;margin-top:4px">font/ (vide)</div>
+            <span class="tree-file missing">Sora-Light.ttf <span class="tree-badge missing">MANQUANT</span></span>
+            <span class="tree-file missing">JetBrainsMono-Regular.ttf <span class="tree-badge missing">MANQUANT</span></span>
+            <div class="tree-dir" style="padding-left:12px;margin-top:4px">layout/</div>
+            <span class="tree-file partial">activity_main.xml <span class="tree-badge partial">ANCIEN</span></span>
+            <span class="tree-file partial">activity_capture.xml <span class="tree-badge partial">ANCIEN</span></span>
+            <div class="tree-dir" style="padding-left:12px;margin-top:4px">values/</div>
+            <span class="tree-file partial">colors.xml <span class="tree-badge partial">ANCIEN</span></span>
+            <span class="tree-file missing">dimens.xml <span class="tree-badge missing">MANQUANT</span></span>
+            <span class="tree-file partial">strings.xml <span class="tree-badge partial">INCOMPLET</span></span>
+            <span class="tree-file partial">themes.xml <span class="tree-badge partial">ANCIEN</span></span>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-family:monospace;font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-3)">Design ZIP (aso-design-v0.1)</div>
+          <div class="file-tree">
+            <div class="tree-dir">aso-design/app/src/main/res/</div>
+            <div class="tree-dir" style="padding-left:12px">drawable/</div>
+            <span class="tree-file exists">aso_card_bg.xml <span class="tree-badge exists">OK</span></span>
+            <span class="tree-file exists">aso_led_ok.xml <span class="tree-badge exists">OK</span></span>
+            <span class="tree-file exists">aso_led_warn.xml <span class="tree-badge exists">OK</span></span>
+            <span class="tree-file exists">aso_led_crit.xml <span class="tree-badge exists">OK</span></span>
+            <span class="tree-file exists">aso_capture_bg.xml <span class="tree-badge exists">OK</span></span>
+            <div class="tree-dir" style="padding-left:12px;margin-top:4px">font/ (à fournir)</div>
+            <span class="tree-file missing">Sora-*.ttf <span class="tree-badge missing">A FOURNIR</span></span>
+            <span class="tree-file missing">JetBrainsMono-*.ttf <span class="tree-badge missing">A FOURNIR</span></span>
+            <div class="tree-dir" style="padding-left:12px;margin-top:4px">layout/</div>
+            <span class="tree-file exists">activity_main.xml <span class="tree-badge exists">NOUVEAU</span></span>
+            <span class="tree-file exists">activity_capture.xml <span class="tree-badge exists">NOUVEAU</span></span>
+            <div class="tree-dir" style="padding-left:12px;margin-top:4px">values/</div>
+            <span class="tree-file exists">colors.xml <span class="tree-badge exists">NOUVEAU</span></span>
+            <span class="tree-file exists">dimens.xml <span class="tree-badge exists">NOUVEAU</span></span>
+            <span class="tree-file exists">strings.xml <span class="tree-badge exists">NOUVEAU</span></span>
+            <span class="tree-file exists">themes.xml <span class="tree-badge exists">NOUVEAU</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="diff-card" style="margin-top:var(--space-5)">
+        <div class="diff-header">
+          <span class="diff-tag ok">RÉSUMÉ</span>
+          <span class="diff-title">Score d'intégration : 0 / 12 fichiers intégrés</span>
+        </div>
+        <div class="diff-body">
+          <p class="diff-desc">Tous les fichiers du design ZIP sont disponibles mais <strong>aucun n'a encore été copié</strong> dans le projet. Les 12 fichiers sont prêts dans <code style="font-family:monospace;font-size:11px">app/design/aso-design-v0.1.zip</code>. Il suffit de les extraire et de les copier dans les bons répertoires en suivant le guide d'intégration (6 étapes).</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function show(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+</script>
+</body>
+</html>

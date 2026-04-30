@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ============================================
+         ASO Design Tokens — Couleurs
+         Direction : instrument scientifique
+         Mode chantier (sombre prioritaire)
+         ============================================ -->
+
+    <!-- Surfaces -->
+    <color name="aso_bg_base">#0E0F11</color>
+    <color name="aso_bg_surface">#16181C</color>
+    <color name="aso_bg_elevated">#1E2127</color>
+    <color name="aso_bg_overlay">#D90E0F11</color>
+
+    <!-- Bordures -->
+    <color name="aso_border_subtle">#0FFFFFFF</color>
+    <color name="aso_border_default">#1FFFFFFF</color>
+    <color name="aso_border_strong">#33FFFFFF</color>
+
+    <!-- Texte -->
+    <color name="aso_text_primary">#F2F3F5</color>
+    <color name="aso_text_secondary">#9DA3AE</color>
+    <color name="aso_text_tertiary">#5C6371</color>
+    <color name="aso_text_disabled">#3A3F49</color>
+    <color name="aso_text_on_accent">#0E0F11</color>
+
+    <!-- Accent ASO -->
+    <color name="aso_accent">#4ADE80</color>
+    <color name="aso_accent_dim">#1F4ADE80</color>
+    <color name="aso_accent_glow">#404ADE80</color>
+
+    <!-- Statuts sémantiques -->
+    <color name="aso_status_ok">#4ADE80</color>
+    <color name="aso_status_warn">#F59E0B</color>
+    <color name="aso_status_crit">#EF4444</color>
+    <color name="aso_status_info">#60A5FA</color>
+
+    <!-- Compatibilité Material 3 -->
+    <color name="primary">#F2F3F5</color>
+    <color name="primary_dark">#0E0F11</color>
+    <color name="accent">#4ADE80</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="red_critical">#EF4444</color>
+    <color name="green_ok">#4ADE80</color>
+    <color name="orange_warning">#F59E0B</color>
+
+</resources>

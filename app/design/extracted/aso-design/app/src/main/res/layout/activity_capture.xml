@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/aso_capture_bg"
+    tools:context=".ui.CaptureActivity">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/preview_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- HUD top : REC + duration -->
+    <LinearLayout
+        android:id="@+id/hud_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/aso_space_4"
+        android:background="#E60E0F11"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <View
+            android:layout_width="@dimen/aso_status_led_size"
+            android:layout_height="@dimen/aso_status_led_size"
+            android:background="@drawable/aso_led_crit"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:id="@+id/rec_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/capture_rec"
+            style="@style/AsoText.Mono"
+            android:textColor="@color/aso_text_primary"
+            android:layout_marginStart="@dimen/aso_space_2"/>
+
+        <TextView
+            android:id="@+id/duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00:00"
+            style="@style/AsoText.Mono"
+            android:textColor="@color/aso_text_primary"
+            android:fontFeatureSettings="tnum"/>
+    </LinearLayout>
+
+    <!-- HUD indicators (right side) -->
+    <LinearLayout
+        android:id="@+id/hud_indicators"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/aso_space_3"
+        app:layout_constraintTop_toBottomOf="@id/hud_top"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/aso_space_2">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/aso_card_bg"
+            android:padding="@dimen/aso_space_2"
+            android:layout_marginBottom="@dimen/aso_space_1">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ind_imu"
+                style="@style/AsoText.MonoLabel"/>
+            <View
+                android:layout_width="@dimen/aso_status_led_size"
+                android:layout_height="@dimen/aso_status_led_size"
+                android:background="@drawable/aso_led_ok"
+                android:layout_marginStart="@dimen/aso_space_2"/>
+            <TextView
+                android:id="@+id/indicator_imu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="200 Hz"
+                style="@style/AsoText.Mono"
+                android:textColor="@color/aso_text_primary"
+                android:layout_marginStart="@dimen/aso_space_2"
+                android:fontFeatureSettings="tnum"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/aso_card_bg"
+            android:padding="@dimen/aso_space_2"
+            android:layout_marginBottom="@dimen/aso_space_1">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ind_gnss"
+                style="@style/AsoText.MonoLabel"/>
+            <View
+                android:layout_width="@dimen/aso_status_led_size"
+                android:layout_height="@dimen/aso_status_led_size"
+                android:background="@drawable/aso_led_ok"
+                android:layout_marginStart="@dimen/aso_space_2"/>
+            <TextView
+                android:id="@+id/indicator_gnss"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="14 / 4·L5"
+                style="@style/AsoText.Mono"
+                android:textColor="@color/aso_text_primary"
+                android:layout_marginStart="@dimen/aso_space_2"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/aso_card_bg"
+            android:padding="@dimen/aso_space_2">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ind_baro"
+                style="@style/AsoText.MonoLabel"/>
+            <View
+                android:layout_width="@dimen/aso_status_led_size"
+                android:layout_height="@dimen/aso_status_led_size"
+                android:background="@drawable/aso_led_ok"
+                android:layout_marginStart="@dimen/aso_space_2"/>
+            <TextView
+                android:id="@+id/indicator_baro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1013.2"
+                style="@style/AsoText.Mono"
+                android:textColor="@color/aso_text_primary"
+                android:layout_marginStart="@dimen/aso_space_2"
+                android:fontFeatureSettings="tnum"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- HUD bottom : coverage + actions -->
+    <LinearLayout
+        android:id="@+id/hud_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/aso_space_5"
+        android:background="#F50E0F11"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/aso_space_2">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/hud_coverage"
+                style="@style/AsoText.MonoLabel"/>
+
+            <TextView
+                android:id="@+id/coverage_pct"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="67 %"
+                style="@style/AsoText.Mono"
+                android:textColor="@color/aso_accent"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/coverage_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:max="100"
+            android:progress="67"
+            android:progressTint="@color/aso_accent"
+            android:progressBackgroundTint="@color/aso_border_default"
+            android:layout_marginBottom="@dimen/aso_space_5"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <Button
+                android:id="@+id/btn_gcp"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/aso_hud_button_height"
+                android:layout_weight="1"
+                android:text="@string/hud_btn_gcp"
+                style="@style/AsoButton.Secondary"
+                android:layout_marginEnd="@dimen/aso_space_1"/>
+
+            <Button
+                android:id="@+id/btn_burst"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/aso_hud_button_height"
+                android:layout_weight="1"
+                android:text="@string/hud_btn_burst"
+                style="@style/AsoButton.Secondary"
+                android:layout_marginEnd="@dimen/aso_space_1"/>
+
+            <Button
+                android:id="@+id/btn_stop"
+                android:layout_width="@dimen/aso_hud_stop_size"
+                android:layout_height="@dimen/aso_hud_stop_size"
+                android:text=""
+                style="@style/AsoButton.Critical"
+                android:layout_marginHorizontal="@dimen/aso_space_2"/>
+
+            <Button
+                android:id="@+id/btn_scale"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/aso_hud_button_height"
+                android:layout_weight="1"
+                android:text="@string/hud_btn_scale"
+                style="@style/AsoButton.Secondary"
+                android:layout_marginStart="@dimen/aso_space_1"/>
+
+            <Button
+                android:id="@+id/btn_note"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/aso_hud_button_height"
+                android:layout_weight="1"
+                android:text="@string/hud_btn_note"
+                style="@style/AsoButton.Secondary"
+                android:layout_marginStart="@dimen/aso_space_1"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

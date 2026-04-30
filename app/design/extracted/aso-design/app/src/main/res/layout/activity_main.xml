@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/aso_bg_base"
+    android:padding="@dimen/aso_space_8"
+    tools:context=".ui.MainActivity">
+
+    <!-- Brand A·SO -->
+    <LinearLayout
+        android:id="@+id/brand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/aso_space_10"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_brand_a"
+            android:textSize="@dimen/aso_text_display"
+            android:fontFamily="sans-serif-light"
+            android:textColor="@color/aso_text_primary"
+            android:letterSpacing="-0.05"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_brand_so"
+            android:textSize="@dimen/aso_text_display"
+            android:fontFamily="sans-serif-black"
+            android:textStyle="bold"
+            android:textColor="@color/aso_text_primary"
+            android:letterSpacing="-0.05"
+            android:layout_marginStart="@dimen/aso_space_2"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tagline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_tagline"
+        style="@style/AsoText.MonoLabel"
+        android:layout_marginTop="@dimen/aso_space_1"
+        app:layout_constraintTop_toBottomOf="@id/brand"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <!-- Status card -->
+    <LinearLayout
+        android:id="@+id/status_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/aso_card_bg"
+        android:padding="@dimen/aso_space_5"
+        android:layout_marginTop="@dimen/aso_space_12"
+        app:layout_constraintTop_toBottomOf="@id/tagline">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="@dimen/aso_space_2">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/home_status_system"
+                style="@style/AsoText.MonoLabel"/>
+            <View
+                android:layout_width="@dimen/aso_status_led_size"
+                android:layout_height="@dimen/aso_status_led_size"
+                android:background="@drawable/aso_led_ok"
+                android:layout_gravity="center_vertical"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/home_status_operational"
+                style="@style/AsoText.Mono"
+                android:textColor="@color/aso_text_primary"
+                android:layout_marginStart="@dimen/aso_space_2"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Action principale -->
+    <LinearLayout
+        android:id="@+id/action_primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/aso_text_primary"
+        android:padding="@dimen/aso_space_6"
+        android:layout_marginTop="@dimen/aso_space_8"
+        app:layout_constraintTop_toBottomOf="@id/status_card"
+        android:clickable="true"
+        android:focusable="true">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/start_scan"
+                android:textSize="@dimen/aso_text_md"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/aso_bg_base"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/start_scan_sub"
+                style="@style/AsoText.MonoLabel"
+                android:textColor="#8C0E0F11"
+                android:layout_marginTop="@dimen/aso_space_1"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="→"
+            android:textSize="@dimen/aso_text_lg"
+            android:textColor="@color/aso_bg_base"
+            android:fontFamily="sans-serif-light"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
